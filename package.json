@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.3",
     "@netlify/functions": "^4.1.11",
     "@supabase/supabase-js": "latest",
     "@types/node-fetch": "^2.6.12",
