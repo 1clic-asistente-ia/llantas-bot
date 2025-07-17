@@ -72,19 +72,10 @@ const handler: Handler = async (event, context) => {
         for (const entry of payload.entry) {
           const pageId = entry.id;
           
-          // 🔍 LOGGING DETALLADO PARA CAPTURAR PAGE ID REAL
-          console.log('='.repeat(60));
-          console.log('🔍 WEBHOOK RECIBIDO - INFORMACIÓN DETALLADA:');
-          console.log(`📱 Page ID recibido: ${pageId}`);
-          console.log(`📊 Entry completa:`, JSON.stringify(entry, null, 2));
-          console.log('='.repeat(60));
-          
           // Obtener información del cliente
           const cliente = await getClienteByPageId(pageId);
           if (!cliente) {
-            console.error(`❌ Cliente no encontrado para page_id: ${pageId}`);
-            console.error(`🔧 SOLUCIÓN: Ejecutar script de actualización con este Page ID`);
-            console.error(`📋 Page ID a usar en base de datos: ${pageId}`);
+            console.error(`Cliente no encontrado para page_id: ${pageId}`);
             continue;
           }
 
