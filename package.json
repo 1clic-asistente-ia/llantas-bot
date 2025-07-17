@@ -9,21 +9,22 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest",
+    "@netlify/functions": "^4.1.11",
     "@supabase/supabase-js": "latest",
+    "crypto": "latest",
+    "next": "latest",
     "openai": "latest",
-    "crypto": "latest"
+    "react": "latest",
+    "react-dom": "latest"
   },
   "devDependencies": {
-    "typescript": "latest",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
     "postcss": "latest",
     "tailwindcss": "latest",
-    "eslint": "latest",
-    "eslint-config-next": "latest"
+    "typescript": "latest"
   }
 }
