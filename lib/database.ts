@@ -55,7 +55,7 @@ export async function getOrCreateConversacion(clienteId: string, facebookUserId:
   try {
     // Buscar conversación activa existente
     let { data: conversacion, error } = await supabase
-      .from('conversaciones')
+      .from('conversations')
       .select('*')
       .eq('cliente_id', clienteId)
       .eq('facebook_user_id', facebookUserId)
@@ -70,7 +70,7 @@ export async function getOrCreateConversacion(clienteId: string, facebookUserId:
     // Si no existe, crear nueva
     if (!conversacion) {
       const { data: nuevaConversacion, error: createError } = await supabase
-        .from('conversaciones')
+        .from('conversations')
         .insert({
           cliente_id: clienteId,
           facebook_user_id: facebookUserId,
@@ -122,7 +122,7 @@ export async function guardarMensaje(
 
     // Actualizar última actividad de la conversación
     await supabase
-      .from('conversaciones')
+      .from('conversations')
       .update({ 
         ultima_actividad: new Date().toISOString(),
         updated_at: new Date().toISOString()
