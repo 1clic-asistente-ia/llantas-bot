@@ -1,69 +1,105 @@
 import { Handler } from '@netlify/functions';
 import crypto from 'crypto';
-
-// Si necesitas importar supabase/openai, adapta los paths según sea necesario
-// import { supabase } from '../../lib/supabase';
-// import { openai } from '../../lib/openai';
+import { sendMessage, markSeen, typingOn } from '../../lib/facebook';
+import { 
+  getClienteByPageId, 
+  getOrCreateConversacion, 
+  guardarMensaje, 
+  getMensajesRecientes 
+} from '../../lib/database';
+import { generateResponse } from '../../lib/openai';
 
 const FACEBOOK_VERIFY_TOKEN = process.env.FACEBOOK_VERIFY_TOKEN;
 const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
 
 const handler: Handler = async (event, context) => {
+  // Verificación del webhook (GET)
   if (event.httpMethod === 'GET') {
     const params = event.queryStringParameters || {};
     const mode = params['hub.mode'];
     const token = params['hub.verify_token'];
     const challenge = params['hub.challenge'];
 
+    console.log('Verificación de webhook:', { mode, token: token ? 'presente' : 'ausente' });
+
     if (mode === 'subscribe' && token === FACEBOOK_VERIFY_TOKEN) {
+      console.log('Webhook verificado exitosamente');
       return {
         statusCode: 200,
         body: challenge || ''
       };
     }
+    
+    console.log('Verificación fallida');
     return {
       statusCode: 403,
       body: 'Invalid verification'
     };
   }
 
+  // Procesamiento de mensajes (POST)
   if (event.httpMethod === 'POST') {
-    const signature = event.headers['x-hub-signature-256'] || '';
-    const body = event.body || '';
+    try {
+      // Verificar firma de Facebook
+      const signature = event.headers['x-hub-signature-256'] || '';
+      const body = event.body || '';
 
-    const hmac = crypto.createHmac('sha256', FACEBOOK_APP_SECRET!);
-    hmac.update(body);
-    const expectedSignature = 'sha256=' + hmac.digest('hex');
+      if (!FACEBOOK_APP_SECRET) {
+        console.error('FACEBOOK_APP_SECRET no configurado');
+        return {
+          statusCode: 500,
+          body: 'Server configuration error'
+        };
+      }
 
-    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
-      return {
-        statusCode: 403,
-        body: 'Invalid signature'
-      };
-    }
+      const hmac = crypto.createHmac('sha256', FACEBOOK_APP_SECRET);
+      hmac.update(body);
+      const expectedSignature = 'sha256=' + hmac.digest('hex');
 
-    const payload = JSON.parse(body);
-    if (payload.object === 'page') {
-      for (const entry of payload.entry) {
-        for (const messagingEvent of entry.messaging) {
-          const senderId = messagingEvent.sender.id;
+      if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
+        console.error('Firma inválida');
+        return {
+          statusCode: 403,
+          body: 'Invalid signature'
+        };
+      }
+
+      const payload = JSON.parse(body);
+      console.log('Payload recibido:', JSON.stringify(payload, null, 2));
+
+      if (payload.object === 'page') {
+        // Procesar cada entrada del webhook
+        for (const entry of payload.entry) {
           const pageId = entry.id;
-          const message = messagingEvent.message?.text;
+          
+          // Obtener información del cliente
+          const cliente = await getClienteByPageId(pageId);
+          if (!cliente) {
+            console.error(`Cliente no encontrado para page_id: ${pageId}`);
+            continue;
+          }
 
-          if (message) {
-            // TODO: Obtener cliente_id de pageId
-            // TODO: Manejar contexto de conversación
-            // TODO: Llamar a OpenAI con Prompt Maestro
-            // TODO: Enviar respuesta via Messenger API
-            console.log(`Mensaje recibido de ${senderId} en página ${pageId}: ${message}`);
+          console.log(`Procesando mensajes para cliente: ${cliente.nombre_negocio}`);
+
+          // Procesar cada evento de messaging
+          for (const messagingEvent of entry.messaging) {
+            await procesarMensaje(messagingEvent, cliente);
           }
         }
       }
+
+      return {
+        statusCode: 200,
+        body: 'EVENT_RECEIVED'
+      };
+
+    } catch (error) {
+      console.error('Error procesando webhook:', error);
+      return {
+        statusCode: 500,
+        body: 'Internal server error'
+      };
     }
-    return {
-      statusCode: 200,
-      body: 'EVENT_RECEIVED'
-    };
   }
 
   return {
@@ -71,5 +107,76 @@ const handler: Handler = async (event, context) => {
     body: 'Method Not Allowed'
   };
 };
+
+// Función para procesar un mensaje individual
+async function procesarMensaje(messagingEvent: any, cliente: any) {
+  try {
+    const senderId = messagingEvent.sender.id;
+    const message = messagingEvent.message;
+
+    // Solo procesar mensajes de texto (por ahora)
+    if (!message || !message.text) {
+      console.log('Mensaje sin texto, ignorando');
+      return;
+    }
+
+    const mensajeTexto = message.text;
+    console.log(`Mensaje de ${senderId}: ${mensajeTexto}`);
+
+    // Marcar como visto y mostrar typing
+    await markSeen(senderId);
+    await typingOn(senderId);
+
+    // Obtener o crear conversación
+    const conversacion = await getOrCreateConversacion(cliente.id, senderId);
+    if (!conversacion) {
+      console.error('No se pudo crear/obtener conversación');
+      await enviarMensajeError(senderId);
+      return;
+    }
+
+    // Guardar mensaje del usuario
+    await guardarMensaje(conversacion.id, mensajeTexto, 'usuario', {
+      facebook_message_id: message.mid,
+      timestamp: Date.now()
+    });
+
+    // Obtener mensajes recientes para contexto
+    const mensajesRecientes = await getMensajesRecientes(conversacion.id, 15);
+
+    // Generar respuesta usando OpenAI
+    const respuestaBot = await generateResponse(
+      mensajeTexto,
+      mensajesRecientes,
+      conversacion.resumen_contexto,
+      cliente
+    );
+
+    // Enviar respuesta
+    await sendMessage(senderId, { text: respuestaBot });
+
+    // Guardar respuesta del bot
+    await guardarMensaje(conversacion.id, respuestaBot, 'bot', {
+      timestamp: Date.now()
+    });
+
+    console.log(`Respuesta enviada a ${senderId}: ${respuestaBot.substring(0, 100)}...`);
+
+  } catch (error) {
+    console.error('Error procesando mensaje:', error);
+    await enviarMensajeError(messagingEvent.sender.id);
+  }
+}
+
+// Función para enviar mensaje de error
+async function enviarMensajeError(senderId: string) {
+  try {
+    await sendMessage(senderId, {
+      text: 'Disculpa, hubo un problema técnico. ¿Puedes intentar de nuevo en un momento?'
+    });
+  } catch (error) {
+    console.error('Error enviando mensaje de error:', error);
+  }
+}
 
 export { handler };
