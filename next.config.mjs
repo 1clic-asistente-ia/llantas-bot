@@ -4,7 +4,7 @@ const nextConfig = {
   swcMinify: true,
   output: 'standalone',
   experimental: {
-    topLevelAwait: true,
+    // topLevelAwait removed as it's not recognized by Next.js
   },
 };
 
