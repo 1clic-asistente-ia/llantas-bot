@@ -76,7 +76,7 @@ export async function POST(req: Request) {
             .order('creado_en', { ascending: true })
             .limit(10);
 
-          // 4. Llamar a la IA (Claude) con el prompt y el historial
+          // 4. Llamar a la IA con el prompt y el historial
           const aiResponse = await generateResponse(message, conversationHistory || [], '', cliente);
           // 5. Enviar respuesta de la IA al usuario
           await sendMessage(senderId, { text: aiResponse });

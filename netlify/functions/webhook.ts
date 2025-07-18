@@ -7,7 +7,7 @@ import {
   guardarMensaje, 
   getMensajesRecientes 
 } from '../../lib/database';
-import { generateResponse } from '../../lib/claude';
+// Eliminado: import { generateResponse } from '../../lib/claude';
 
 const FACEBOOK_VERIFY_TOKEN = process.env.FACEBOOK_VERIFY_TOKEN;
 const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
@@ -153,8 +153,8 @@ async function procesarMensaje(messagingEvent: any, cliente: any) {
     // Obtener mensajes recientes para contexto
     const mensajesRecientes = await getMensajesRecientes(conversacion.id, 15);
 
-    // Generar respuesta usando Claude
-    console.log('Generando respuesta con Claude...');
+    // Eliminado: // Generar respuesta usando Claude
+    // Eliminado: console.log('Generando respuesta con Claude...');
     const respuestaBot = await generateResponse(
       mensajeTexto,
       mensajesRecientes,
