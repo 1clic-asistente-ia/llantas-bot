@@ -7,7 +7,7 @@ import {
   guardarMensaje, 
   getMensajesRecientes 
 } from '../../lib/database';
-// Eliminado: import { generateResponse } from '../../lib/claude';
+import { generateResponse } from '../../lib/openai';
 
 const FACEBOOK_VERIFY_TOKEN = process.env.FACEBOOK_VERIFY_TOKEN;
 const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
@@ -153,15 +153,13 @@ async function procesarMensaje(messagingEvent: any, cliente: any) {
     // Obtener mensajes recientes para contexto
     const mensajesRecientes = await getMensajesRecientes(conversacion.id, 15);
 
-    // Eliminado: // Generar respuesta usando Claude
-    // Eliminado: console.log('Generando respuesta con Claude...');
-    // Eliminado: const respuestaBot = await generateResponse(
-    //   mensajeTexto,
-    //   mensajesRecientes,
-    //   conversacion.resumen_contexto,
-    //   cliente
-    // );
-    const respuestaBot = "[IA no disponible: implementar función de respuesta]";
+    // Generar respuesta usando OpenAI
+    const respuestaBot = await generateResponse(
+      mensajeTexto,
+      mensajesRecientes,
+      conversacion.resumen_contexto,
+      cliente
+    );
 
     // Enviar respuesta
     await sendMessage(senderId, { text: respuestaBot });
