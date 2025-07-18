@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json('Invalid verification', { status: 403 });
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const body = await req.text();
   const signature = req.headers.get('x-hub-signature-256') || '';
 
@@ -77,7 +77,8 @@ export async function POST(req: NextRequest) {
             .limit(10);
 
           // 4. Llamar a la IA (Claude) con el prompt y el historial
-          const aiResponse = await generateResponse(message, conversationHistory || [], '', cliente);
+          // Elimino la línea fuera de función:
+          // const aiResponse = await generateResponse(message, conversationHistory || [], '', cliente);
           // 5. Enviar respuesta de la IA al usuario
           await sendMessage(senderId, { text: aiResponse });
 
@@ -97,4 +98,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json('EVENT_RECEIVED', { status: 200 });
 }
-const aiResponse = await generateResponse(message, conversationHistory || [], '', cliente);
