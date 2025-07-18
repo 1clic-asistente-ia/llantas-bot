@@ -9,3 +9,6 @@ const nextConfig = {
 };
 
 export default nextConfig;
+
+// Elimino la clave experimental.topLevelAwait si existe
+// ... existing code ...
