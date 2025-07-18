@@ -15,7 +15,7 @@ Bot inteligente para llanterías en Facebook Messenger, con enfoque anti-flow pa
 1. Clona el repositorio: `git clone https://github.com/1clic-asistente-ia/llantas-bot.git`
 2. Navega al directorio: `cd llantas-bot`
 3. Instala dependencias: `npm install`
-4. Copia `.env.example` a `.env.local` y llena con tus credenciales (de Credenciales Proyecto Bot-----.txt).
+4. Copia `.env.example` a `.env.local` y llena con tus credenciales.
 
 ## Ejecución Local
 - Desarrollo: `npm run dev` (corre en http://localhost:3000)
