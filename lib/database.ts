@@ -196,12 +196,11 @@ export async function buscarCompatibles(clienteId: string, medida: string): Prom
     // En el futuro se puede expandir con una tabla de compatibilidades
     const { data, error } = await supabase
       .from('inventario')
-      .select('medida, COUNT(*) as cantidad')
+      .select('medida, cantidad')
       .eq('cliente_id', clienteId)
       .eq('disponible', true)
       .gt('cantidad', 0)
       .neq('medida', medida)
-      .group('medida')
       .order('cantidad', { ascending: false })
       .limit(5);
 
@@ -210,7 +209,19 @@ export async function buscarCompatibles(clienteId: string, medida: string): Prom
       return [];
     }
 
-    return data || [];
+    // Agrupar manualmente por medida y sumar cantidades
+    const agrupado: Record<string, number> = {};
+    (data || []).forEach((item: any) => {
+      if (!agrupado[item.medida]) agrupado[item.medida] = 0;
+      agrupado[item.medida] += item.cantidad;
+    });
+    // Convertir a array y ordenar por cantidad descendente
+    const resultado = Object.entries(agrupado)
+      .map(([medida, cantidad]) => ({ medida, cantidad }))
+      .sort((a, b) => b.cantidad - a.cantidad)
+      .slice(0, 5);
+
+    return resultado;
   } catch (error) {
     console.error('Error en buscarCompatibles:', error);
     return [];
