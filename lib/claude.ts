@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { type MessageParam } from '@anthropic-ai/sdk/resources';
 
 export const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -11,7 +12,7 @@ export async function getClaudeResponse(
   historialConversacion: { remitente: string; contenido: string }[]
 ): Promise<string> {
   try {
-    const messages = historialConversacion.map(msg => ({
+    const messages: MessageParam[] = historialConversacion.map(msg => ({
       role: msg.remitente === 'usuario' ? 'user' : 'assistant',
       content: msg.contenido
     }));
