@@ -155,12 +155,13 @@ async function procesarMensaje(messagingEvent: any, cliente: any) {
 
     // Eliminado: // Generar respuesta usando Claude
     // Eliminado: console.log('Generando respuesta con Claude...');
-    const respuestaBot = await generateResponse(
-      mensajeTexto,
-      mensajesRecientes,
-      conversacion.resumen_contexto,
-      cliente
-    );
+    // Eliminado: const respuestaBot = await generateResponse(
+    //   mensajeTexto,
+    //   mensajesRecientes,
+    //   conversacion.resumen_contexto,
+    //   cliente
+    // );
+    const respuestaBot = "[IA no disponible: implementar función de respuesta]";
 
     // Enviar respuesta
     await sendMessage(senderId, { text: respuestaBot });
