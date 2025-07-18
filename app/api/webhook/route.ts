@@ -3,7 +3,7 @@ import crypto from 'crypto';
 
 import { supabase } from '@/lib/supabase';
 import { sendMessage, markSeen, typingOn } from '@/lib/facebook';
-import { getClaudeResponse } from '@/lib/claude';
+import { generateResponse } from '@/lib/openai';
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
             .limit(10);
 
           // 4. Llamar a la IA (Claude) con el prompt y el historial
-          const aiResponse = await getClaudeResponse(cliente.prompt_claude, message, conversationHistory || []);
+          const aiResponse = await generateResponse(cliente.prompt_openai, message, conversationHistory || []);
 
           // 5. Enviar respuesta de la IA al usuario
           await sendMessage(senderId, { text: aiResponse });

@@ -16,9 +16,10 @@ out/
 .env.production.local
 
 # Vercel
-.vercel
+
 
 # OS generated files
+# Línea eliminada
 .DS_Store
 .DS_Store?
 ._*
