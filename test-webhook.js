@@ -1,12 +1,20 @@
 // Script de diagnóstico - Verificar webhook
 const fetch = require('node-fetch');
+const args = process.argv.slice(2);
+let testMessage = 'Hola, esto es una prueba';
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === '--message' && i + 1 < args.length) {
+    testMessage = args[i + 1];
+    break;
+  }
+}
 
 async function testWebhook() {
   try {
     console.log('🔍 Probando webhook...');
     
     // Probar GET (verificación)
-    const getResponse = await fetch('http://localhost:3001/api/webhook?hub.mode=subscribe&hub.challenge=test123&hub.verify_token=llantasbot123');
+    const getResponse = await fetch('http://localhost:9999/.netlify/functions/webhook?hub.mode=subscribe&hub.challenge=test123&hub.verify_token=llantasbot123');
     const getResult = await getResponse.text();
     
     console.log('✅ GET Response:', getResult);
@@ -23,14 +31,14 @@ async function testWebhook() {
           timestamp: Date.now(),
           message: {
             mid: 'test_message_id',
-            text: 'Hola, esto es una prueba'
+            text: testMessage
           }
         }]
       }]
     };
     
-    console.log('🔄 Enviando mensaje de prueba...');
-    const postResponse = await fetch('http://localhost:3001/api/webhook', {
+    console.log('🔄 Enviando mensaje de prueba:', testMessage);
+    const postResponse = await fetch('http://localhost:9999/.netlify/functions/webhook', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -49,3 +57,4 @@ async function testWebhook() {
 }
 
 testWebhook();
+// Remove the unused WEBHOOK_URL line at the end

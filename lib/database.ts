@@ -166,16 +166,17 @@ export async function buscarLlantas(clienteId: string, medida: string, marca?: s
       .select('*')
       .eq('cliente_id', clienteId)
       .eq('medida', medida)
-      .gt('total_disponible_medida', 0);
+      .eq('disponibilidad', 'Disponible');
 
     if (marca) {
       query = query.ilike('marca', `%${marca}%`);
     }
 
     const { data, error } = await query
-      .order('precio', { ascending: true })
-      .limit(10);
+      .order('precio', { ascending: true });
+      // .limit(10);
 
+    console.log('buscarLlantas - clienteId:', clienteId, 'medida:', medida, 'marca:', marca, 'results:', data?.length || 0);
     if (error) {
       console.error('Error buscando llantas:', error);
       return [];
@@ -191,32 +192,29 @@ export async function buscarLlantas(clienteId: string, medida: string, marca?: s
 // Buscar medidas compatibles
 export async function buscarCompatibles(clienteId: string, medida: string): Promise<any[]> {
   try {
-    // Lógica simplificada para medidas compatibles
-    // En el futuro se puede expandir con una tabla de compatibilidades
     const { data, error } = await supabase
       .from('inventario')
-      .select('medida, total_disponible_medida')
+      .select('medida')
       .eq('cliente_id', clienteId)
-      .gt('total_disponible_medida', 0)
+      .eq('disponibilidad', 'Disponible')
       .neq('medida', medida)
-      .order('total_disponible_medida', { ascending: false })
-      .limit(5);
+      .limit(500);
 
+    console.log('buscarCompatibles - clienteId:', clienteId, 'medida:', medida, 'results:', data?.length || 0);
     if (error) {
       console.error('Error buscando compatibles:', error);
       return [];
     }
 
-    // Agrupar manualmente por medida y sumar cantidades
     const agrupado: Record<string, number> = {};
     (data || []).forEach((item: any) => {
       if (!agrupado[item.medida]) agrupado[item.medida] = 0;
-      agrupado[item.medida] += item.total_disponible_medida;
+      agrupado[item.medida] += 1;
     });
-    // Convertir a array y ordenar por cantidad descendente
+
     const resultado = Object.entries(agrupado)
       .map(([medida, cantidad]) => ({ medida, cantidad }))
-      .sort((a, b) => b.total_disponible_medida - a.total_disponible_medida)
+      .sort((a, b) => b.cantidad - a.cantidad)
       .slice(0, 5);
 
     return resultado;
