@@ -56,12 +56,16 @@ const handler: Handler = async (event, context) => {
       hmac.update(body);
       const expectedSignature = 'sha256=' + hmac.digest('hex');
 
-      if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
-        console.error('Firma inválida');
-        return {
-          statusCode: 403,
-          body: 'Invalid signature'
-        };
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Skipping signature validation in development mode');
+      } else {
+        if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
+          console.error('Firma inválida');
+          return {
+            statusCode: 403,
+            body: 'Invalid signature'
+          };
+        }
       }
 
       const payload = JSON.parse(body);
@@ -104,6 +108,7 @@ const handler: Handler = async (event, context) => {
 
     } catch (error) {
       console.error('Error procesando webhook:', error);
+console.error('Stack trace:', error.stack);
       return {
         statusCode: 500,
         body: 'Internal server error'
@@ -133,11 +138,15 @@ async function procesarMensaje(messagingEvent: any, cliente: any) {
     console.log(`Mensaje de ${senderId}: ${mensajeTexto}`);
 
     // Marcar como visto y mostrar typing
-    await markSeen(senderId);
-    await typingOn(senderId);
+    if (process.env.NODE_ENV !== 'development') {
+      await markSeen(senderId);
+      await typingOn(senderId);
+    } else {
+      console.log('Skipping markSeen and typingOn in development');
+    }
 
     // Obtener o crear conversación
-    const conversacion = await getOrCreateConversacion(cliente.id, senderId);
+    const conversacion = await getOrCreateConversacion(cliente.id_cliente, senderId);
     if (!conversacion) {
       console.error('No se pudo crear/obtener conversación');
       await enviarMensajeError(senderId);
@@ -162,7 +171,11 @@ async function procesarMensaje(messagingEvent: any, cliente: any) {
     );
 
     // Enviar respuesta
-    await sendMessage(senderId, { text: respuestaBot });
+    if (process.env.NODE_ENV !== 'development') {
+      await sendMessage(senderId, { text: respuestaBot });
+    } else {
+      console.log('Simulated send: ', respuestaBot);
+    }
 
     // Guardar respuesta del bot
     await guardarMensaje(conversacion.id, respuestaBot, 'bot', {
@@ -173,6 +186,8 @@ async function procesarMensaje(messagingEvent: any, cliente: any) {
 
   } catch (error) {
     console.error('Error procesando mensaje:', error);
+console.error('Stack trace:', error.stack);
+console.error('Detalles del error:', JSON.stringify(error, null, 2));
     await enviarMensajeError(messagingEvent.sender.id);
   }
 }
@@ -180,11 +195,16 @@ async function procesarMensaje(messagingEvent: any, cliente: any) {
 // Función para enviar mensaje de error
 async function enviarMensajeError(senderId: string) {
   try {
-    await sendMessage(senderId, {
-      text: 'Disculpa, hubo un problema técnico. ¿Puedes intentar de nuevo en un momento?'
-    });
+    if (process.env.NODE_ENV !== 'development') {
+      await sendMessage(senderId, {
+        text: 'Disculpa, hubo un problema técnico. ¿Puedes intentar de nuevo en un momento?'
+      });
+    } else {
+      console.log('Simulated error message send');
+    }
   } catch (error) {
     console.error('Error enviando mensaje de error:', error);
+console.error('Stack trace:', error.stack);
   }
 }
 

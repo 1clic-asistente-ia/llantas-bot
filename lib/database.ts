@@ -21,7 +21,7 @@ export interface Mensaje {
 }
 
 export interface Cliente {
-  id: string;
+  id_cliente: string;
   nombre_negocio: string;
   facebook_page_id: string;
   configuracion: any;
@@ -55,7 +55,7 @@ export async function getOrCreateConversacion(clienteId: string, facebookUserId:
   try {
     // Buscar conversación activa existente
     let { data: conversacion, error } = await supabase
-      .from('conversations')
+      .from('conversaciones')
       .select('*')
       .eq('cliente_id', clienteId)
       .eq('facebook_user_id', facebookUserId)
@@ -70,7 +70,7 @@ export async function getOrCreateConversacion(clienteId: string, facebookUserId:
     // Si no existe, crear nueva
     if (!conversacion) {
       const { data: nuevaConversacion, error: createError } = await supabase
-        .from('conversations')
+        .from('conversaciones')
         .insert({
           cliente_id: clienteId,
           facebook_user_id: facebookUserId,
@@ -122,7 +122,7 @@ export async function guardarMensaje(
 
     // Actualizar última actividad de la conversación
     await supabase
-      .from('conversations')
+      .from('conversaciones')
       .update({ 
         ultima_actividad: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -166,8 +166,7 @@ export async function buscarLlantas(clienteId: string, medida: string, marca?: s
       .select('*')
       .eq('cliente_id', clienteId)
       .eq('medida', medida)
-      .eq('disponible', true)
-      .gt('cantidad', 0);
+      .gt('total_disponible_medida', 0);
 
     if (marca) {
       query = query.ilike('marca', `%${marca}%`);
@@ -196,12 +195,11 @@ export async function buscarCompatibles(clienteId: string, medida: string): Prom
     // En el futuro se puede expandir con una tabla de compatibilidades
     const { data, error } = await supabase
       .from('inventario')
-      .select('medida, cantidad')
+      .select('medida, total_disponible_medida')
       .eq('cliente_id', clienteId)
-      .eq('disponible', true)
-      .gt('cantidad', 0)
+      .gt('total_disponible_medida', 0)
       .neq('medida', medida)
-      .order('cantidad', { ascending: false })
+      .order('total_disponible_medida', { ascending: false })
       .limit(5);
 
     if (error) {
@@ -213,12 +211,12 @@ export async function buscarCompatibles(clienteId: string, medida: string): Prom
     const agrupado: Record<string, number> = {};
     (data || []).forEach((item: any) => {
       if (!agrupado[item.medida]) agrupado[item.medida] = 0;
-      agrupado[item.medida] += item.cantidad;
+      agrupado[item.medida] += item.total_disponible_medida;
     });
     // Convertir a array y ordenar por cantidad descendente
     const resultado = Object.entries(agrupado)
       .map(([medida, cantidad]) => ({ medida, cantidad }))
-      .sort((a, b) => b.cantidad - a.cantidad)
+      .sort((a, b) => b.total_disponible_medida - a.total_disponible_medida)
       .slice(0, 5);
 
     return resultado;

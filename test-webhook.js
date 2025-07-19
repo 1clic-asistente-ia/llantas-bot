@@ -6,7 +6,7 @@ async function testWebhook() {
     console.log('🔍 Probando webhook...');
     
     // Probar GET (verificación)
-    const getResponse = await fetch('https://llanteras-bot.netlify.app/.netlify/functions/webhook?hub.mode=subscribe&hub.challenge=test123&hub.verify_token=llantasbot123');
+    const getResponse = await fetch('http://localhost:3001/api/webhook?hub.mode=subscribe&hub.challenge=test123&hub.verify_token=llantasbot123');
     const getResult = await getResponse.text();
     
     console.log('✅ GET Response:', getResult);
@@ -15,11 +15,11 @@ async function testWebhook() {
     const postData = {
       object: 'page',
       entry: [{
-        id: '61577782224691',
+        id: '608661302340026',
         time: Date.now(),
         messaging: [{
-          sender: { id: 'test_user_123' },
-          recipient: { id: '61577782224691' },
+          sender: { id: '1234567890123456' },
+          recipient: { id: '608661302340026' },
           timestamp: Date.now(),
           message: {
             mid: 'test_message_id',
@@ -30,7 +30,7 @@ async function testWebhook() {
     };
     
     console.log('🔄 Enviando mensaje de prueba...');
-    const postResponse = await fetch('https://llanteras-bot.netlify.app/.netlify/functions/webhook', {
+    const postResponse = await fetch('http://localhost:3001/api/webhook', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
