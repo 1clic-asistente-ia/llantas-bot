@@ -106,7 +106,7 @@ const handler: Handler = async (event, context) => {
         body: 'EVENT_RECEIVED'
       };
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error procesando webhook:', error);
 console.error('Stack trace:', error.stack);
       return {
