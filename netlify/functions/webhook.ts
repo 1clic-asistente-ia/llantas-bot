@@ -202,7 +202,7 @@ async function enviarMensajeError(senderId: string) {
     } else {
       console.log('Simulated error message send');
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error enviando mensaje de error:', error);
 console.error('Stack trace:', error.stack);
   }
