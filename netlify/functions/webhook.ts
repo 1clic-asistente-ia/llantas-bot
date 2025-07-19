@@ -184,7 +184,7 @@ async function procesarMensaje(messagingEvent: any, cliente: any) {
 
     console.log(`Respuesta enviada a ${senderId}: ${respuestaBot.substring(0, 100)}...`);
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error procesando mensaje:', error);
 console.error('Stack trace:', error.stack);
 console.error('Detalles del error:', JSON.stringify(error, null, 2));
