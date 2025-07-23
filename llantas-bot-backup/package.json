@@ -1,0 +1,33 @@
+{
+  "name": "llantas-bot",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@netlify/functions": "^4.1.11",
+    "@supabase/supabase-js": "latest",
+    "@types/node-fetch": "^2.6.12",
+    "crypto": "latest",
+    "next": "latest",
+    "node-fetch": "^2.7.0",
+    "openai": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "esbuild": "^0.13.9",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "postcss": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest"
+  }
+}
