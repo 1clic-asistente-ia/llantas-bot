@@ -2,13 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  output: 'standalone',
+  // Removido output: 'standalone' para compatibilidad con Netlify
   experimental: {
     // topLevelAwait removed as it's not recognized by Next.js
   },
 };
 
 export default nextConfig;
-
-// Elimino la clave experimental.topLevelAwait si existe
-// ... existing code ...
