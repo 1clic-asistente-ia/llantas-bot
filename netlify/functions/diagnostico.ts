@@ -11,7 +11,7 @@ const handler: Handler = async (event, context) => {
   }
 
   try {
-    const diagnostico = {
+    const diagnostico: any = {
       timestamp: new Date().toISOString(),
       variables_entorno: {
         OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'CONFIGURADA ✅' : 'NO CONFIGURADA ❌',
