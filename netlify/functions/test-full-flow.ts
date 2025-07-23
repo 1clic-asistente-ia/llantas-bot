@@ -8,13 +8,16 @@ const handler: Handler = async (event, context) => {
 
     // Simular datos de cliente (usando el primer cliente disponible)
     const cliente = {
-      id_cliente: 1,
+      id_cliente: "1",
       nombre_negocio: "Test Llantas",
-      telefono: "123456789",
-      direccion: "Test Address",
-      horarios: "Lun-Vie 8-18",
-      servicios: "Venta y reparación de llantas",
-      page_id: "test"
+      facebook_page_id: "test_page_id",
+      configuracion: {
+        telefono: "123456789",
+        direccion: "Test Address",
+        horarios: "Lun-Vie 8-18",
+        servicios: "Venta y reparación de llantas"
+      },
+      activo: true
     };
 
     console.log('✅ Cliente simulado:', cliente.nombre_negocio);
@@ -25,7 +28,7 @@ const handler: Handler = async (event, context) => {
 
     // Simular mensajes recientes vacíos (nueva conversación)
     const mensajesRecientes: any[] = [];
-    const resumenContexto = null;
+    const resumenContexto = "";
 
     console.log('🤖 Llamando a generateResponse...');
 

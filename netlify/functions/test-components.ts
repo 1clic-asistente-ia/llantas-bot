@@ -30,7 +30,7 @@ const handler: Handler = async (event, context) => {
     // 3. Probar importación de Database
     let databaseStatus = 'ERROR';
     try {
-      const { supabase } = await import('../../lib/database');
+      const { getClienteByPageId } = await import('../../lib/database');
       databaseStatus = 'OK - Importación exitosa';
     } catch (error: any) {
       databaseStatus = `ERROR - ${error.message}`;
@@ -40,7 +40,7 @@ const handler: Handler = async (event, context) => {
     // 4. Probar conexión a Supabase
     let supabaseConnectionStatus = 'ERROR';
     try {
-      const { supabase } = await import('../../lib/database');
+      const { supabase } = await import('../../lib/supabase');
       const { data, error } = await supabase.from('clientes').select('count').limit(1);
       if (error) {
         supabaseConnectionStatus = `ERROR - ${error.message}`;
