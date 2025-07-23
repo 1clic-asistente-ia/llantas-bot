@@ -197,7 +197,7 @@ export async function generateResponse(
     ];
 
     const completion = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
+      model: process.env.OPENAI_MODEL || 'gpt-4',
       messages: messages as any,
       tools: tools,
       tool_choice: 'auto',
@@ -224,7 +224,7 @@ export async function generateResponse(
         
         // Generar respuesta final incorporando el resultado de la herramienta
         const finalCompletion = await openai.chat.completions.create({
-          model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
+          model: process.env.OPENAI_MODEL || 'gpt-4',
           messages: [
             { role: 'system', content: prompt },
             { role: 'user', content: mensajeUsuario },

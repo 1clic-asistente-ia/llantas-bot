@@ -12,7 +12,9 @@ export const handler: Handler = async (event, context) => {
         statusCode: 200,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
         },
         body: JSON.stringify({
           error: 'OPENAI_API_KEY no está configurada',
@@ -38,7 +40,9 @@ export const handler: Handler = async (event, context) => {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
       },
       body: JSON.stringify({
         status: response.ok ? 'SUCCESS' : 'ERROR',
@@ -56,7 +60,9 @@ export const handler: Handler = async (event, context) => {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
       },
       body: JSON.stringify({
         error: 'Error al probar OpenAI',
