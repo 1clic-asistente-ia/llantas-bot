@@ -1,6 +1,6 @@
 import { Handler } from '@netlify/functions';
-import { generateResponse } from '../utils/openai';
-import { getClienteByPageId } from '../utils/database';
+import { generateResponse } from '../../lib/openai';
+import { getClienteByPageId } from '../../lib/database';
 
 const handler: Handler = async (event, context) => {
   try {

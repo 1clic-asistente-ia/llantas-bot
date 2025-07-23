@@ -20,7 +20,7 @@ const handler: Handler = async (event, context) => {
     // 2. Probar importación de OpenAI
     let openaiStatus = 'ERROR';
     try {
-      const { openai } = await import('../utils/openai');
+      const { openai } = await import('../../lib/openai');
       openaiStatus = 'OK - Importación exitosa';
     } catch (error: any) {
       openaiStatus = `ERROR - ${error.message}`;
@@ -30,7 +30,7 @@ const handler: Handler = async (event, context) => {
     // 3. Probar importación de Database
     let databaseStatus = 'ERROR';
     try {
-      const { supabase } = await import('../utils/database');
+      const { supabase } = await import('../../lib/database');
       databaseStatus = 'OK - Importación exitosa';
     } catch (error: any) {
       databaseStatus = `ERROR - ${error.message}`;
@@ -40,7 +40,7 @@ const handler: Handler = async (event, context) => {
     // 4. Probar conexión a Supabase
     let supabaseConnectionStatus = 'ERROR';
     try {
-      const { supabase } = await import('../utils/database');
+      const { supabase } = await import('../../lib/database');
       const { data, error } = await supabase.from('clientes').select('count').limit(1);
       if (error) {
         supabaseConnectionStatus = `ERROR - ${error.message}`;
@@ -55,7 +55,7 @@ const handler: Handler = async (event, context) => {
     // 5. Probar llamada simple a OpenAI
     let openaiCallStatus = 'ERROR';
     try {
-      const { openai } = await import('../utils/openai');
+      const { openai } = await import('../../lib/openai');
       const response = await openai.chat.completions.create({
         model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
         messages: [{ role: 'user', content: 'Responde solo "OK"' }],

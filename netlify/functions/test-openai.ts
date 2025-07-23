@@ -1,4 +1,5 @@
 import { Handler } from '@netlify/functions';
+import { openai } from '../../lib/openai';
 
 export const handler: Handler = async (event, context) => {
   try {
