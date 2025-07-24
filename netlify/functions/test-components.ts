@@ -12,7 +12,9 @@ const handler: Handler = async (event, context) => {
       SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? 'Configurada' : 'NO CONFIGURADA',
       FACEBOOK_PAGE_ACCESS_TOKEN: process.env.FACEBOOK_PAGE_ACCESS_TOKEN ? 'Configurada' : 'NO CONFIGURADA',
       FACEBOOK_VERIFY_TOKEN: process.env.FACEBOOK_VERIFY_TOKEN ? 'Configurada' : 'NO CONFIGURADA',
-      FACEBOOK_APP_SECRET: process.env.FACEBOOK_APP_SECRET ? 'Configurada' : 'NO CONFIGURADA'
+      FACEBOOK_APP_SECRET: process.env.FACEBOOK_APP_SECRET ? 'Configurada' : 'NO CONFIGURADA',
+      SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Configurada' : 'NO CONFIGURADA',
+      SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Configurada' : 'NO CONFIGURADA'
     };
 
     console.log('✅ Variables de entorno:', envVars);
@@ -46,6 +48,9 @@ const handler: Handler = async (event, context) => {
         supabaseConnectionStatus = `ERROR - ${error.message}`;
       } else {
         supabaseConnectionStatus = 'OK - Conexión exitosa';
+        console.log('Conexión a Supabase exitosa para URL:', process.env.SUPABASE_URL);
+        console.log('Primer mensaje de prueba exitoso');
+        return { statusCode: 200, body: 'Test exitoso' };
       }
     } catch (error: any) {
       supabaseConnectionStatus = `ERROR - ${error.message}`;
@@ -109,3 +114,16 @@ const handler: Handler = async (event, context) => {
 };
 
 export { handler };
+
+const testSupabaseConnection = async () => {
+  try {
+    console.log('Verificando conexión con Supabase');
+    console.log('Variable S_UPABASE_URL actual:', process.env.SUPABASE_URL);
+    console.log('Variable NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+    console.log('S_UPABASE_ANON_KEY:', typeof process.env.SUPABASE_ANON_KEY);
+    console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY:', typeof process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+    // Implementación de la prueba de conexión
+  } catch (error) {
+    console.error('Error inicializando Supabase:', error.message);
+  }
+};

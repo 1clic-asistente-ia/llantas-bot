@@ -172,7 +172,12 @@ export async function ejecutarHerramienta(
         return 'Lo siento, no pude procesar esa solicitud en este momento.';
     }
   } catch (error) {
-    console.error('Error ejecutando herramienta:', error);
+    console.error('Error ejecutando herramienta:', {
+      message: error.message,
+      code: error.code,
+      status: error.status,
+      details: error
+    });
     return 'Disculpa, hubo un problema técnico. ¿Puedes intentar de nuevo?';
   }
 }
@@ -244,7 +249,12 @@ export async function generateResponse(
     return respuesta.content || 'Disculpa, no pude generar una respuesta en este momento.';
     
   } catch (error) {
-    console.error('Error generando respuesta:', error);
+    console.error('Error generando respuesta:', {
+      message: error.message,
+      code: error.code,
+      status: error.status,
+      details: error
+    });
     return 'Disculpa, hubo un problema técnico. ¿Puedes intentar de nuevo en un momento?';
   }
 }
