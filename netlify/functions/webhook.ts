@@ -125,6 +125,7 @@ console.error('Stack trace:', error.stack);
 // Función para procesar un mensaje individual
 async function procesarMensaje(messagingEvent: any, cliente: any) {
   try {
+    console.log('🚀 INICIANDO procesarMensaje');
     const senderId = messagingEvent.sender.id;
     const message = messagingEvent.message;
 
@@ -135,9 +136,10 @@ async function procesarMensaje(messagingEvent: any, cliente: any) {
     }
 
     const mensajeTexto = message.text;
-    console.log(`Mensaje de ${senderId}: ${mensajeTexto}`);
+    console.log(`📝 Mensaje de ${senderId}: ${mensajeTexto}`);
 
     // Marcar como visto y mostrar typing
+    console.log('📱 Marcando como visto y typing...');
     if (process.env.NODE_ENV !== 'development') {
       await markSeen(senderId);
       await typingOn(senderId);
@@ -146,48 +148,63 @@ async function procesarMensaje(messagingEvent: any, cliente: any) {
     }
 
     // Obtener o crear conversación
+    console.log('💬 Obteniendo/creando conversación...');
     const conversacion = await getOrCreateConversacion(cliente.id_cliente, senderId);
     if (!conversacion) {
-      console.error('No se pudo crear/obtener conversación');
+      console.error('❌ No se pudo crear/obtener conversación');
       await enviarMensajeError(senderId);
       return;
     }
+    console.log(`✅ Conversación obtenida: ${conversacion.id}`);
 
     // Guardar mensaje del usuario
+    console.log('💾 Guardando mensaje del usuario...');
     await guardarMensaje(conversacion.id, mensajeTexto, 'usuario', {
       facebook_message_id: message.mid,
       timestamp: Date.now()
     });
+    console.log('✅ Mensaje del usuario guardado');
 
     // Obtener mensajes recientes para contexto
+    console.log('📚 Obteniendo mensajes recientes...');
     const mensajesRecientes = await getMensajesRecientes(conversacion.id, 15);
+    console.log(`✅ ${mensajesRecientes.length} mensajes recientes obtenidos`);
 
     // Generar respuesta usando OpenAI
+    console.log('🤖 Generando respuesta con OpenAI...');
+    console.log(`🔧 Modelo configurado: ${process.env.OPENAI_MODEL || 'no configurado'}`);
     const respuestaBot = await generateResponse(
       mensajeTexto,
       mensajesRecientes,
       conversacion.resumen_contexto,
       cliente
     );
+    console.log(`✅ Respuesta generada: ${respuestaBot.substring(0, 100)}...`);
 
     // Enviar respuesta
+    console.log('📤 Enviando respuesta...');
     if (process.env.NODE_ENV !== 'development') {
       await sendMessage(senderId, { text: respuestaBot });
     } else {
       console.log('Simulated send: ', respuestaBot);
     }
+    console.log('✅ Respuesta enviada');
 
     // Guardar respuesta del bot
+    console.log('💾 Guardando respuesta del bot...');
     await guardarMensaje(conversacion.id, respuestaBot, 'bot', {
       timestamp: Date.now()
     });
+    console.log('✅ Respuesta del bot guardada');
 
-    console.log(`Respuesta enviada a ${senderId}: ${respuestaBot.substring(0, 100)}...`);
+    console.log(`🎉 Proceso completado exitosamente para ${senderId}`);
 
   } catch (error: any) {
-    console.error('Error procesando mensaje:', error);
-console.error('Stack trace:', error.stack);
-console.error('Detalles del error:', JSON.stringify(error, null, 2));
+    console.error('❌ ERROR EN procesarMensaje:', error);
+    console.error('📍 Stack trace:', error.stack);
+    console.error('🔍 Detalles del error:', JSON.stringify(error, null, 2));
+    console.error('🔧 Tipo de error:', error.constructor.name);
+    console.error('💬 Mensaje de error:', error.message);
     await enviarMensajeError(messagingEvent.sender.id);
   }
 }
