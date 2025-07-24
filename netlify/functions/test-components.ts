@@ -13,8 +13,8 @@ const handler: Handler = async (event, context) => {
       FACEBOOK_PAGE_ACCESS_TOKEN: process.env.FACEBOOK_PAGE_ACCESS_TOKEN ? 'Configurada' : 'NO CONFIGURADA',
       FACEBOOK_VERIFY_TOKEN: process.env.FACEBOOK_VERIFY_TOKEN ? 'Configurada' : 'NO CONFIGURADA',
       FACEBOOK_APP_SECRET: process.env.FACEBOOK_APP_SECRET ? 'Configurada' : 'NO CONFIGURADA',
-      SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Configurada' : 'NO CONFIGURADA',
-      SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Configurada' : 'NO CONFIGURADA'
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Configurada' : 'NO CONFIGURADA',
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Configurada' : 'NO CONFIGURADA'
     };
 
     console.log('✅ Variables de entorno:', envVars);
