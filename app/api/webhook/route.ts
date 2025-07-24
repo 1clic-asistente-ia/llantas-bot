@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 import { sendMessage, markSeen, typingOn } from '@/lib/facebook';
 import { generateResponse } from '@/lib/openai';
 
@@ -46,6 +46,7 @@ export async function POST(req: Request) {
         const message = messagingEvent.message?.text;
 
         if (message) {
+          const supabase = getSupabase();
           await markSeen(senderId);
           await typingOn(senderId);
 
