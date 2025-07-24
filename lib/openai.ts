@@ -171,7 +171,7 @@ export async function ejecutarHerramienta(
       default:
         return 'Lo siento, no pude procesar esa solicitud en este momento.';
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error ejecutando herramienta:', {
       message: error.message,
       code: error.code,
@@ -248,7 +248,7 @@ export async function generateResponse(
     
     return respuesta.content || 'Disculpa, no pude generar una respuesta en este momento.';
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generando respuesta:', {
       message: error.message,
       code: error.code,
