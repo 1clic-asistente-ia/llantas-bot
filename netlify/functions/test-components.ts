@@ -123,7 +123,7 @@ const testSupabaseConnection = async () => {
     console.log('S_UPABASE_ANON_KEY:', typeof process.env.SUPABASE_ANON_KEY);
     console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY:', typeof process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
     // Implementación de la prueba de conexión
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error inicializando Supabase:', error.message);
   }
 };
