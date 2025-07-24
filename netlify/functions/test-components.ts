@@ -57,7 +57,7 @@ const handler: Handler = async (event, context) => {
     try {
       const { openai } = await import('../../lib/openai');
       const response = await openai.chat.completions.create({
-        model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
+        model: process.env.OPENAI_MODEL || 'gpt-4',
         messages: [{ role: 'user', content: 'Responde solo "OK"' }],
         max_tokens: 10
       });
